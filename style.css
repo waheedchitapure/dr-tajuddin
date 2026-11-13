@@ -367,3 +367,7 @@ body.spine-hold{user-select:none;-webkit-user-select:none;-webkit-touch-callout:
 @media (max-width:860px){.side-nav{display:none}}
 .hero-spec,.hero-tags,.scroll-cue{transition:opacity .5s}
 body.spine-exploded .hero-spec,body.spine-exploded .hero-tags,body.spine-exploded .scroll-cue,body.spine-exploded .spine-hint{opacity:0!important}
+.spine-dim{position:fixed;inset:0;z-index:4;background:rgba(7,9,12,.62);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);pointer-events:none;opacity:0;visibility:hidden}
+#spine.lift{z-index:5}
+.spine-labels{z-index:6}
+body.spine-exploded .nav,body.spine-exploded .side-nav{opacity:.25;transition:opacity .4s}

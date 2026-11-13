@@ -218,6 +218,7 @@ for (let i = 0; i <= N; i++) {
   el.style.setProperty('--c', '#' + r.col.getHexString());
   labelsBox.appendChild(el); labelEls.push(el);
 }
+const dim = document.createElement('div'); dim.className = 'spine-dim'; document.body.appendChild(dim);
 const tip = document.createElement('div'); tip.className = 'spine-tip'; document.body.appendChild(tip);
 let tipIdx = -2;
 
@@ -288,12 +289,12 @@ function frame() {
   mouse.x += (mouse.tx - mouse.x) * 0.05; mouse.y += (mouse.ty - mouse.y) * 0.05;
 
   // scroll choreography: rotate, drift left, tilt
-  root.position.x = (layout.x + THREE.MathUtils.smoothstep(p, 0.1, 0.9) * 0.8) * (innerWidth < 860 ? 1 - Math.min(Math.max(explode, 0), 1) * 0.65 : 1);
+  root.position.x = (layout.x + THREE.MathUtils.smoothstep(p, 0.1, 0.9) * 0.8) * (1 - Math.min(Math.max(explode, 0), 1) * 0.7);
   root.position.y = Math.sin(t * 0.6) * 0.08 + p * 0.6;
   // spring for the explode (small overshoot = elastic snap-back)
   expV += (explodeT - explode) * 0.1; expV *= 0.8; explode += expV;
   const ex = Math.max(explode, -0.08);
-  root.scale.setScalar(layout.scale * (1 + p * 0.12) * (1 - Math.min(ex, 1.15) * 0.36));
+  root.scale.setScalar(layout.scale * (1 + p * 0.12) * (1 - Math.min(ex, 1.15) * 0.2));
   yawAuto += dt * 0.22 * (1 - Math.min(Math.max(ex, 0), 1) * 0.9);
   if (!ptr.dragging) { dragYaw += dragV; dragV *= 0.94; }
   spine.rotation.y = yawAuto + dragYaw + p * Math.PI * 1.6 + mouse.x * 0.5 * (1 - Math.min(Math.max(ex, 0), 1));
@@ -322,6 +323,9 @@ function frame() {
   });
 
   // labels follow each bone while exploded
+  const dimA = Math.min(Math.max(ex, 0), 1);
+  dim.style.opacity = dimA; dim.style.visibility = dimA > 0.01 ? 'visible' : 'hidden';
+  canvas.classList.toggle('lift', dimA > 0.01);
   const showL = ex > 0.25;
   labelsBox.classList.toggle("on", showL); document.body.classList.toggle("spine-exploded", showL);
   if (showL) {
@@ -331,7 +335,7 @@ function frame() {
     vertebrae.forEach(m => {
       const u = m.userData; if (u.disc) return;
       m.getWorldPosition(tmpV); tmpV.project(camera);
-      labelEls[u.i].style.transform = `translate(${tmpV.x * w + w + 46 * layout.scale}px,${-tmpV.y * h2 + h2}px) translateY(-50%)`;
+      labelEls[u.i].style.transform = `translate(${tmpV.x * w + w + 70 * root.scale.x * (innerHeight / 760)}px,${-tmpV.y * h2 + h2}px) translateY(-50%)`;
     });
   }
 
