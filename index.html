@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dr. Tajuddin Chitapure — Physiotherapist, Educator & Pain Scientist</title>
+<meta name="description" content="Dr. Tajuddin Chitapure (PT) — Associate Professor at MGM School of Physiotherapy. Expert in chronic pain and musculoskeletal rehabilitation, educator and international speaker.">
+<meta property="og:title" content="Dr. Tajuddin Chitapure — Physiotherapist & Pain Scientist">
+<meta property="og:description" content="Chronic pain & musculoskeletal rehabilitation. Educator. Researcher. Speaker.">
+<meta property="og:image" content="assets/img/profile-1.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307090c'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' font-family='Georgia' font-style='italic' font-size='34' fill='%23ff5b2e'%3ETc%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+</head>
+<body>
+
+<!-- ============ PRELOADER ============ -->
+<div class="loader" id="loader">
+  <svg class="loader-ecg" viewBox="0 0 600 120" preserveAspectRatio="none"><path d="M0 60 H200 L220 60 L235 20 L255 105 L270 40 L282 60 H600"/></svg>
+  <div class="loader-row">
+    <span class="mono">Loading anatomy</span>
+    <span class="loader-count" id="loaderCount">0</span>
+  </div>
+</div>
+
+<!-- ============ CHROME ============ -->
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><div class="cursor-dot"></div><div class="cursor-ring"><span class="cursor-label"></span></div></div>
+<div class="hover-img" aria-hidden="true"><img alt=""></div>
+
+<header class="nav">
+  <a href="#top" class="nav-logo" data-magnetic>T<em>c</em></a>
+  <nav class="nav-links">
+    <a href="#about">About</a>
+    <a href="#expertise">Expertise</a>
+    <a href="#journey">Journey</a>
+    <a href="#awards">Awards</a>
+    <a href="#stage">Speaking</a>
+    <a href="#insights">Insights</a>
+  </nav>
+  <a href="#contact" class="nav-cta" data-magnetic>Connect <span>↗</span></a>
+  <button class="burger" aria-label="Open menu" aria-expanded="false"><i></i><i></i></button>
+</header>
+<div class="mobile-menu" aria-hidden="true">
+  <nav>
+    <a href="#about"><span class="mono">01</span>About</a>
+    <a href="#expertise"><span class="mono">02</span>Expertise</a>
+    <a href="#journey"><span class="mono">04</span>Journey</a>
+    <a href="#awards"><span class="mono">05</span>Awards</a>
+    <a href="#stage"><span class="mono">06</span>Speaking</a>
+    <a href="#insights"><span class="mono">07</span>Insights</a>
+    <a href="#contact"><span class="mono">08</span>Connect</a>
+  </nav>
+  <p class="mono">Dr. Tajuddin Chitapure (PT) · Chhatrapati Sambhajinagar</p>
+</div>
+
+<canvas id="spine" aria-hidden="true"></canvas>
+
+<main id="top">
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-meta mono">
+    <span><i class="dot"></i> Associate Professor · MGM School of Physiotherapy</span>
+    <span>19.87° N, 75.34° E — Chhatrapati Sambhajinagar</span>
+  </div>
+  <h1 class="hero-title">
+    <span class="line"><span class="split">Dr. Tajuddin</span></span>
+    <span class="line"><span class="split italic">Chitapure</span><sup class="mono">(PT)</sup></span>
+  </h1>
+  <div class="hero-bottom">
+    <p class="hero-lead reveal-up">Physiotherapist, educator &amp; pain scientist — rebuilding how people <em>move</em>, <em>heal</em> and <em>understand</em> their pain.</p>
+    <div class="hero-tags mono reveal-up">
+      <span>Chronic Pain</span><span>Musculoskeletal Rehab</span><span>Pain Neuroscience</span><span>Speaker</span>
+    </div>
+  </div>
+  <div class="scroll-cue mono"><span>Scroll to explore the anatomy</span><i></i></div>
+  <div class="hero-spec mono" aria-hidden="true">
+    <div>FIG. 01</div><div>Columna vertebralis</div><div>C1 — S5 · 33 segments</div>
+  </div>
+</section>
+
+<!-- ============ MARQUEE ============ -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>Pain Neuroscience</span><b>✦</b><span>Manual Therapy</span><b>✦</b><span>Biopsychosocial Care</span><b>✦</b><span>Clinical Reasoning</span><b>✦</b><span>Evidence-Based Practice</span><b>✦</b><span>Sports Injuries</span><b>✦</b>
+    <span>Pain Neuroscience</span><b>✦</b><span>Manual Therapy</span><b>✦</b><span>Biopsychosocial Care</span><b>✦</b><span>Clinical Reasoning</span><b>✦</b><span>Evidence-Based Practice</span><b>✦</b><span>Sports Injuries</span><b>✦</b>
+  </div>
+</div>
+
+<!-- ============ ABOUT ============ -->
+<section class="about" id="about">
+  <div class="section-label mono"><span>01</span> The Clinician</div>
+  <p class="manifesto" data-words>
+    Pain is not always a measure of damage. It is the nervous system's best guess about threat — and my work is helping people, patients and students rewrite that guess.
+  </p>
+  <div class="about-grid">
+    <figure class="portrait">
+      <div class="portrait-frame"><img src="assets/img/profile-1.jpg" alt="Dr. Tajuddin Chitapure"></div>
+      <figcaption class="mono"><span>Dr. Tajuddin Chitapure</span><span>MPT · Musculoskeletal Sciences</span></figcaption>
+      <svg class="portrait-ring" viewBox="0 0 200 200"><circle cx="100" cy="100" r="96"/></svg>
+    </figure>
+    <div class="about-copy">
+      <p class="lead reveal-up">Associate Professor and Head of Musculoskeletal Physiotherapy at <strong>MGM School of Physiotherapy</strong> (MGM Institute of Health Sciences, NAAC A++), with more than a decade of clinical work across Mumbai, Pune and Chhatrapati Sambhajinagar.</p>
+      <p class="reveal-up">Trained at <strong>SVNIRTAR, Cuttack</strong> — one of India's national rehabilitation institutes — he blends manual therapy, graded loading and pain neuroscience education into a biopsychosocial approach that treats the person, not just the tissue.</p>
+      <p class="reveal-up">An active member of the <strong>International Association for the Study of Pain (IASP)</strong>, he researches, publishes and teaches the next generation of physiotherapists to think like clinicians — not protocol followers.</p>
+      <div class="stats">
+        <div class="stat"><b data-count="12" data-suffix="+">0</b><span class="mono">Years in practice</span></div>
+        <div class="stat"><b data-count="26" data-suffix="+">0</b><span class="mono">Peer-reviewed articles</span></div>
+        <div class="stat"><b data-count="4">0</b><span class="mono">Patents</span></div>
+        <div class="stat"><b data-count="10" data-suffix="+">0</b><span class="mono">Awards &amp; honours</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXPERTISE / BODY MAP ============ -->
+<section class="expertise" id="expertise">
+  <div class="section-label mono"><span>02</span> Areas of Expertise</div>
+  <h2 class="h-xl"><span class="split">Every joint</span> <span class="split italic">tells a story.</span></h2>
+  <p class="sub reveal-up">Tap a point on the skeleton to see how he assesses and rehabilitates it.</p>
+
+  <div class="bodymap">
+    <div class="skeleton-wrap">
+      <svg class="skeleton" viewBox="0 0 400 820" aria-label="Interactive skeleton diagram">
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ff5b2e" stop-opacity=".55"/><stop offset="1" stop-color="#ff5b2e" stop-opacity="0"/></radialGradient>
+        </defs>
+        <g class="grid-lines">
+          <line x1="200" y1="0" x2="200" y2="820"/><line x1="0" y1="180" x2="400" y2="180"/><line x1="0" y1="430" x2="400" y2="430"/><line x1="0" y1="590" x2="400" y2="590"/>
+        </g>
+        <g class="bones">
+          <!-- skull -->
+          <path d="M200 30 C236 30 252 58 250 88 C248 112 236 126 226 132 L224 146 L176 146 L174 132 C164 126 152 112 150 88 C148 58 164 30 200 30Z"/>
+          <path d="M178 96 a9 9 0 1 0 0.1 0 M222 96 a9 9 0 1 0 0.1 0"/>
+          <path d="M184 130 H216"/>
+          <!-- clavicles & shoulders -->
+          <path d="M200 182 C180 176 150 172 122 182"/><path d="M200 182 C220 176 250 172 278 182"/>
+          <!-- ribs -->
+          <path d="M200 205 C168 200 146 214 142 236"/><path d="M200 205 C232 200 254 214 258 236"/>
+          <path d="M200 228 C164 224 140 240 138 266"/><path d="M200 228 C236 224 260 240 262 266"/>
+          <path d="M200 252 C162 250 138 268 138 294"/><path d="M200 252 C238 250 262 268 262 294"/>
+          <path d="M200 276 C166 276 144 294 146 318"/><path d="M200 276 C234 276 256 294 254 318"/>
+          <path d="M200 300 C174 302 158 318 160 336"/><path d="M200 300 C226 302 242 318 240 336"/>
+          <!-- pelvis -->
+          <path d="M200 400 C178 396 150 398 140 418 C134 440 150 462 172 466 C186 470 194 458 200 448 C206 458 214 470 228 466 C250 462 266 440 260 418 C250 398 222 396 200 400Z"/>
+          <!-- arms -->
+          <path d="M122 182 L98 310"/><path d="M98 310 L82 420"/><path d="M98 310 L92 420"/>
+          <path d="M278 182 L302 310"/><path d="M302 310 L318 420"/><path d="M302 310 L308 420"/>
+          <!-- hands -->
+          <path d="M80 424 L72 470 M86 426 L82 476 M92 426 L92 478 M96 424 L100 470"/>
+          <path d="M320 424 L328 470 M314 426 L318 476 M308 426 L308 478 M304 424 L300 470"/>
+          <!-- legs -->
+          <path d="M170 448 L162 588"/><path d="M162 596 L160 740"/><path d="M168 596 L166 738"/>
+          <path d="M230 448 L238 588"/><path d="M238 596 L240 740"/><path d="M232 596 L234 738"/>
+          <!-- feet -->
+          <path d="M160 744 C150 760 132 772 120 778 L168 780 L170 748"/>
+          <path d="M240 744 C250 760 268 772 280 778 L232 780 L230 748"/>
+        </g>
+        <!-- vertebrae -->
+        <g class="vertebrae"></g>
+        <g class="joints">
+          <circle cx="122" cy="182" r="7"/><circle cx="278" cy="182" r="7"/>
+          <circle cx="98" cy="310" r="6"/><circle cx="302" cy="310" r="6"/>
+          <circle cx="87" cy="422" r="5"/><circle cx="313" cy="422" r="5"/>
+          <circle cx="170" cy="446" r="7"/><circle cx="230" cy="446" r="7"/>
+          <circle cx="164" cy="592" r="8"/><circle cx="236" cy="592" r="8"/>
+          <circle cx="162" cy="742" r="5"/><circle cx="238" cy="742" r="5"/>
+        </g>
+        <g class="hotspots">
+          <g class="hs" data-id="neck" transform="translate(200 160)"><circle class="hs-glow" r="26" fill="url(#glow)"/><circle class="hs-pulse" r="10"/><circle class="hs-core" r="5"/></g>
+          <g class="hs" data-id="shoulder" transform="translate(278 182)"><circle class="hs-glow" r="26" fill="url(#glow)"/><circle class="hs-pulse" r="10"/><circle class="hs-core" r="5"/></g>
+          <g class="hs" data-id="elbow" transform="translate(302 310)"><circle class="hs-glow" r="26" fill="url(#glow)"/><circle class="hs-pulse" r="10"/><circle class="hs-core" r="5"/></g>
+          <g class="hs" data-id="wrist" transform="translate(87 422)"><circle class="hs-glow" r="26" fill="url(#glow)"/><circle class="hs-pulse" r="10"/><circle class="hs-core" r="5"/></g>
+          <g class="hs" data-id="back" transform="translate(200 370)"><circle class="hs-glow" r="26" fill="url(#glow)"/><circle class="hs-pulse" r="10"/><circle class="hs-core" r="5"/></g>
+          <g class="hs" data-id="knee" transform="translate(164 592)"><circle class="hs-glow" r="26" fill="url(#glow)"/><circle class="hs-pulse" r="10"/><circle class="hs-core" r="5"/></g>
+          <g class="hs" data-id="foot" transform="translate(262 772)"><circle class="hs-glow" r="26" fill="url(#glow)"/><circle class="hs-pulse" r="10"/><circle class="hs-core" r="5"/></g>
+        </g>
+      </svg>
+      <div class="skeleton-legend mono"><span>Anterior view</span><span>7 focus regions</span></div>
+    </div>
+
+    <div class="condition-panel">
+      <div class="cp-head mono"><span class="cp-index">01 / 07</span><span class="cp-region">Cervical spine</span></div>
+      <h3 class="cp-title">Tech-Neck</h3>
+      <p class="cp-desc"></p>
+      <div class="cp-cols">
+        <div><h4 class="mono">Clinical clues</h4><ul class="cp-clues"></ul></div>
+        <div><h4 class="mono">Rehab approach</h4><ul class="cp-rehab"></ul></div>
+      </div>
+      <div class="cp-img"><img alt=""></div>
+      <div class="cp-nav">
+        <button class="cp-btn" data-dir="-1" aria-label="Previous">←</button>
+        <button class="cp-btn" data-dir="1" aria-label="Next">→</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAIN PATHWAY (pinned) ============ -->
+<section class="pathway" id="pathway">
+  <div class="pathway-pin">
+    <div class="section-label mono"><span>03</span> Philosophy · The Pain Pathway</div>
+    <div class="pathway-grid">
+      <div class="pathway-steps">
+        <div class="pstep is-active"><span class="mono">01 — Tissue</span><h3>It starts with a signal, not with pain.</h3><p>Nociceptors in tissue detect potential threat — load, heat, chemistry. They send danger signals, not pain.</p></div>
+        <div class="pstep"><span class="mono">02 — Spinal cord</span><h3>The signal is filtered.</h3><p>The spinal cord amplifies or dampens the message. In chronic pain, this gate can stay "turned up" — central sensitisation.</p></div>
+        <div class="pstep"><span class="mono">03 — Brain</span><h3>The brain weighs the evidence.</h3><p>Beliefs, fear, past experience, sleep, stress and context all vote on one question: <em>how dangerous is this?</em></p></div>
+        <div class="pstep"><span class="mono">04 — Output</span><h3>Pain is the brain's output.</h3><p>Pain protects — but it can persist long after tissues heal. That is why education and graded movement work.</p></div>
+        <div class="pstep"><span class="mono">05 — The Person</span><h3>Treat the person, not the scan.</h3><p>Biological, psychological and social factors converge. Good rehabilitation addresses all three.</p></div>
+      </div>
+      <div class="pathway-visual">
+        <svg viewBox="0 0 600 600" class="pw-svg">
+          <defs>
+            <filter id="blur"><feGaussianBlur stdDeviation="6"/></filter>
+          </defs>
+          <!-- path -->
+          <path id="pwPath" class="pw-path-bg" d="M70 520 C140 520 150 430 220 420 C300 408 300 330 300 280 C300 220 300 170 300 150"/>
+          <path class="pw-path" d="M70 520 C140 520 150 430 220 420 C300 408 300 330 300 280 C300 220 300 170 300 150"/>
+          <!-- node: tissue -->
+          <g class="pw-node n1" transform="translate(70 520)"><circle r="34"/><text y="5">Tissue</text></g>
+          <!-- spinal cord segment -->
+          <g class="pw-node n2" transform="translate(300 330)"><rect x="-24" y="-60" width="48" height="120" rx="24"/><text y="5">Cord</text></g>
+          <!-- brain -->
+          <g class="pw-brain" transform="translate(300 130)">
+            <path class="brain-shape" d="M-90 10 C-100 -40 -60 -80 -10 -78 C10 -96 60 -92 78 -62 C110 -50 112 -6 96 12 C104 40 76 62 50 58 C30 78 -10 76 -24 60 C-60 70 -96 46 -90 10Z"/>
+            <path class="brain-fold" d="M-50 -40 C-30 -20 -60 0 -30 20 M0 -60 C10 -30 -10 -10 10 10 C20 30 0 40 10 56 M40 -50 C60 -30 40 -10 64 6"/>
+          </g>
+          <g class="pw-tags">
+            <g class="tag t1" transform="translate(110 70)"><rect x="-56" y="-16" width="112" height="32" rx="16"/><text y="5">Beliefs</text></g>
+            <g class="tag t2" transform="translate(490 70)"><rect x="-56" y="-16" width="112" height="32" rx="16"/><text y="5">Fear</text></g>
+            <g class="tag t3" transform="translate(100 200)"><rect x="-66" y="-16" width="132" height="32" rx="16"/><text y="5">Past experience</text></g>
+            <g class="tag t4" transform="translate(500 200)"><rect x="-56" y="-16" width="112" height="32" rx="16"/><text y="5">Sleep · Stress</text></g>
+          </g>
+          <g class="pw-output" transform="translate(470 420)"><circle r="56"/><circle class="ring" r="56"/><text y="-2">PAIN</text><text y="18" class="small">output</text></g>
+          <path class="pw-out-path" d="M300 150 C420 160 470 260 470 364"/>
+          <circle class="pw-pulse" r="8"/>
+          <!-- BPS circles -->
+          <g class="bps">
+            <circle class="c c1" cx="300" cy="300" r="120"/><circle class="c c2" cx="300" cy="300" r="120"/><circle class="c c3" cx="300" cy="300" r="120"/>
+            <text class="bl b1" x="300" y="300">Bio</text><text class="bl b2" x="300" y="300">Psycho</text><text class="bl b3" x="300" y="300">Social</text>
+            <text class="bl center" x="300" y="306">Person</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="pathway-progress"><i></i></div>
+  </div>
+</section>
+
+<!-- ============ JOURNEY (horizontal) ============ -->
+<section class="journey" id="journey">
+  <div class="journey-pin">
+    <div class="journey-head">
+      <div class="section-label mono"><span>04</span> The Journey</div>
+      <h2 class="h-xl"><span class="split">Two decades,</span> <span class="split italic">one direction.</span></h2>
+    </div>
+    <div class="journey-track">
+      <svg class="journey-line" preserveAspectRatio="none" viewBox="0 0 3000 200"><path d="M0 100 C150 40 300 160 450 100 S750 40 900 100 S1200 160 1350 100 S1650 40 1800 100 S2100 160 2250 100 S2550 40 2700 100 S2900 120 3000 100"/></svg>
+      <article class="jcard"><span class="jyear">2006</span><span class="mono jtag">Education</span><h3>Bachelor of Physiotherapy</h3><p>Maharashtra University of Health Sciences · 2006 — 2010</p></article>
+      <article class="jcard"><span class="jyear">2011</span><span class="mono jtag">Education</span><h3>PG Diploma, Emergency Medical Services</h3><p>Grant Medical Foundation, Ruby Hall Clinic, Pune</p></article>
+      <article class="jcard"><span class="jyear">2011</span><span class="mono jtag">Education</span><h3>Master of Physiotherapy — Musculoskeletal Sciences</h3><p>SVNIRTAR, Olatpur, Cuttack · 2011 — 2013</p></article>
+      <article class="jcard"><span class="jyear">2014</span><span class="mono jtag">Clinical</span><h3>Physiotherapist</h3><p>Doctors For You, Mumbai — assessment &amp; rehab across MSK, neuro and sports injuries; managing rehab services.</p></article>
+      <article class="jcard"><span class="jyear">2015</span><span class="mono jtag">Clinical</span><h3>Consultant Physiotherapist</h3><p>Bharati Hospital &amp; Research Centre, Pune — musculoskeletal physiotherapy &amp; pain management.</p></article>
+      <article class="jcard"><span class="jyear">2016</span><span class="mono jtag">Clinical</span><h3>Consultant Physiotherapist</h3><p>Noble Hospital, Pune — musculoskeletal physiotherapy &amp; pain management.</p></article>
+      <article class="jcard jcard-now"><span class="jyear">2017</span><span class="mono jtag">Academic · Present</span><h3>Associate Professor</h3><p>MGM School of Physiotherapy, Chhatrapati Sambhajinagar — teaching, research and clinical practice for 9+ years.</p></article>
+      <article class="jcard jcard-end"><span class="jyear italic">Now</span><span class="mono jtag">Ongoing</span><h3>Co-PI, ICMR–DHR research project</h3><p>Plus patents, copyrights and two co-authored JOSPT blogs.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AWARDS ============ -->
+<section class="awards" id="awards">
+  <div class="section-label mono"><span>05</span> Recognition</div>
+  <h2 class="h-xl"><span class="split">Hall of</span> <span class="split italic">recognition.</span></h2>
+
+  <div class="award-hero">
+    <div class="award-hero-img"><img src="assets/img/electrocon-1.jpg" alt="ELECTROCON 2026"></div>
+    <div class="award-hero-copy">
+      <span class="mono">ELECTROCON 2026 · 3rd International Conference on Electrotherapy</span>
+      <h3>Best Academician<br><em>of the Year 2026</em></h3>
+      <p>Also awarded <strong>2nd Prize — Faculty Paper Presentation</strong> at the same conference, hosted by Maharashtra Institute of Physiotherapy, Latur.</p>
+      <div class="medal" aria-hidden="true"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50"/><path d="M60 28 L68 50 L92 50 L73 64 L80 88 L60 74 L40 88 L47 64 L28 50 L52 50Z"/></svg></div>
+    </div>
+  </div>
+
+  <div class="award-grid">
+    <article class="award" data-tilt><span class="a-year mono">2026</span><h4>2nd Prize — Senior Professional Poster</h4><p>World Physiotherapy AWP Regional Congress, Yashobhoomi, New Delhi</p></article>
+    <article class="award" data-tilt><span class="a-year mono">2024</span><h4>Best Scientist Award</h4><p>10th INCPT, AIIMS</p></article>
+    <article class="award" data-tilt><span class="a-year mono">2024</span><h4>Academic Eminence Award</h4><p>ELECTROCON 2024</p></article>
+    <article class="award" data-tilt><span class="a-year mono">2024</span><h4>Outstanding Achievement Award</h4><p>OsteoManual Summit 2024</p></article>
+    <article class="award" data-tilt><span class="a-year mono">2024</span><h4>Best Researcher Faculty</h4><p>MGM · ANTARAG 2024</p></article>
+    <article class="award" data-tilt><span class="a-year mono">2023</span><h4>Best Researcher Faculty</h4><p>KALAAGYA 2023</p></article>
+  </div>
+
+  <div class="research-strip">
+    <div><b>26+</b><span class="mono">Peer-reviewed articles</span></div>
+    <div><b>04</b><span class="mono">Patents</span></div>
+    <div><b>02</b><span class="mono">JOSPT blogs co-authored</span></div>
+    <div><b>Co-PI</b><span class="mono">ICMR–DHR sanctioned project</span></div>
+    <div><b>IASP</b><span class="mono">Member · complimentary membership 2025–26</span></div>
+  </div>
+</section>
+
+<!-- ============ SPEAKING ============ -->
+<section class="stage" id="stage">
+  <div class="section-label mono"><span>06</span> On Stage</div>
+  <h2 class="h-xl"><span class="split">Speaker,</span> <span class="split italic">chair &amp; mentor.</span></h2>
+  <ul class="talks">
+    <li class="talk" data-img="assets/img/electrocon-1.jpg"><span class="mono t-date">Oct 2026</span><span class="t-name">ELECTROCON 2026</span><span class="t-role">Award winner · Faculty paper</span><span class="mono t-loc">Latur</span><img class="t-thumb" src="assets/img/electrocon-1.jpg" alt=""></li>
+    <li class="talk" data-img="assets/img/wpawp-1.jpg"><span class="mono t-date">Sep 2026</span><span class="t-name">World Physiotherapy AWP Regional Congress</span><span class="t-role">Poster presenter · 2nd Prize</span><span class="mono t-loc">New Delhi</span><img class="t-thumb" src="assets/img/wpawp-1.jpg" alt=""></li>
+    <li class="talk" data-img="assets/img/svss-1.jpg"><span class="mono t-date">Aug 2026</span><span class="t-name">SVSS PHYSIOCON 2026</span><span class="t-role">Keynote · Biopsychosocial MSK assessment</span><span class="mono t-loc">Latur · Virtual</span><img class="t-thumb" src="assets/img/svss-1.jpg" alt=""></li>
+    <li class="talk" data-img="assets/img/physioconnect-1.jpg"><span class="mono t-date">Aug 2026</span><span class="t-name">PhysioConnect 2026</span><span class="t-role">Chairperson · Orthopaedics meets Physiotherapy</span><span class="mono t-loc">SRIMS</span><img class="t-thumb" src="assets/img/physioconnect-1.jpg" alt=""></li>
+    <li class="talk" data-img="assets/img/befriend-2.jpg"><span class="mono t-date">2026</span><span class="t-name">Befriend the Pain</span><span class="t-role">Co-Resource Person · Pain science workshop</span><span class="mono t-loc">CSN Physio Assoc.</span><img class="t-thumb" src="assets/img/befriend-2.jpg" alt=""></li>
+    <li class="talk" data-img="assets/img/compel-1.jpg"><span class="mono t-date">2026</span><span class="t-name">COMPEL Course</span><span class="t-role">Resource Person · Reading a paper as a story</span><span class="mono t-loc">SRIMS</span><img class="t-thumb" src="assets/img/compel-1.jpg" alt=""></li>
+    <li class="talk" data-img="assets/img/arthritis-3.jpg"><span class="mono t-date">Dec 2025</span><span class="t-name">3rd International Conference on Arthritis</span><span class="t-role">Invited Speaker · Pain pathways to function</span><span class="mono t-loc">Ahilyanagar · Virtual</span><img class="t-thumb" src="assets/img/arthritis-3.jpg" alt=""></li>
+    <li class="talk" data-img="assets/img/icf-2.jpg"><span class="mono t-date">2025</span><span class="t-name">ICF Workshop</span><span class="t-role">Case-based learning · MSK physiotherapy</span><span class="mono t-loc">MGM SOP</span><img class="t-thumb" src="assets/img/icf-2.jpg" alt=""></li>
+  </ul>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="gallery">
+  <div class="gallery-cols">
+    <div class="gcol" data-speed="-12">
+      <img src="assets/img/compel-2.jpg" alt="" loading="lazy"><img src="assets/img/physioconnect-2.jpg" alt="" loading="lazy"><img src="assets/img/befriend-3.jpg" alt="" loading="lazy">
+    </div>
+    <div class="gcol" data-speed="10">
+      <img src="assets/img/icf-3.jpg" alt="" loading="lazy"><img src="assets/img/befriend-1.jpg" alt="" loading="lazy"><img src="assets/img/compel-3.jpg" alt="" loading="lazy">
+    </div>
+    <div class="gcol" data-speed="-18">
+      <img src="assets/img/physioconnect-4.jpg" alt="" loading="lazy"><img src="assets/img/arthritis-1.jpg" alt="" loading="lazy"><img src="assets/img/icf-4.jpg" alt="" loading="lazy">
+    </div>
+    <div class="gcol" data-speed="8">
+      <img src="assets/img/physioconnect-3.jpg" alt="" loading="lazy"><img src="assets/img/svss-4.jpg" alt="" loading="lazy"><img src="assets/img/compel-4.jpg" alt="" loading="lazy">
+    </div>
+  </div>
+  <div class="gallery-overlay"><p class="h-xl"><span class="split italic">From classroom</span> <span class="split">to conference hall.</span></p></div>
+</section>
+
+<!-- ============ INSIGHTS ============ -->
+<section class="insights" id="insights">
+  <div class="insights-head">
+    <div>
+      <div class="section-label mono"><span>07</span> Clinical Insights</div>
+      <h2 class="h-xl"><span class="split">Notes from</span> <span class="split italic">the clinic.</span></h2>
+    </div>
+    <p class="sub reveal-up">Short, evidence-informed lessons he shares with patients, students and clinicians. Drag to explore →</p>
+  </div>
+  <div class="insight-rail" data-drag>
+    <article class="insight"><div class="i-img"><img src="assets/img/post-pain-1.jpg" alt="" loading="lazy"></div><span class="mono">Pain Science</span><h4>Pain doesn't always mean damage</h4><p>Beliefs, fear and perceived threat shape pain. Education recalibrates threat — so movement can return with confidence.</p></article>
+    <article class="insight"><div class="i-img"><img src="assets/img/post-reasoning-1.jpg" alt="" loading="lazy"></div><span class="mono">Clinical Reasoning</span><h4>Rehab fails on reasoning, not exercise</h4><p>Was the assessment enough? Was the load right? Can the decision be explained? That separates routine from professional practice.</p></article>
+    <article class="insight"><div class="i-img"><img src="assets/img/post-rotator-1.jpg" alt="" loading="lazy"></div><span class="mono">Shoulder</span><h4>Rotator cuff: a capacity problem</h4><p>Overload, scapular control and overhead demand — rehab rebuilds capacity rather than prescribing rest.</p></article>
+    <article class="insight"><div class="i-img"><img src="assets/img/post-carpal-1.jpg" alt="" loading="lazy"></div><span class="mono">Hand &amp; Wrist</span><h4>Carpal tunnel, recognised early</h4><p>Night symptoms and thumb-to-ring-finger tingling are key clues. Neural mobility and ergonomics change the course.</p></article>
+    <article class="insight"><div class="i-img"><img src="assets/img/post-tennis-1.jpg" alt="" loading="lazy"></div><span class="mono">Elbow</span><h4>Tennis elbow is about load</h4><p>Progressive (eccentric) loading, motor control and activity modification restore tendon capacity.</p></article>
+    <article class="insight"><div class="i-img"><img src="assets/img/post-plantar-1.jpg" alt="" loading="lazy"></div><span class="mono">Foot</span><h4>Plantar fasciitis: more than heel pain</h4><p>Load modification, calf–fascia mobility and intrinsic foot strength prevent recurrence.</p></article>
+    <article class="insight"><div class="i-img"><img src="assets/img/post-techneck-1.jpg" alt="" loading="lazy"></div><span class="mono">Digital Health</span><h4>Tech-neck</h4><p>Every inch of forward head posture adds load. Eye-level screens and 30-minute breaks go a long way.</p></article>
+    <article class="insight"><div class="i-img"><img src="assets/img/post-microbreak-1.jpg" alt="" loading="lazy"></div><span class="mono">Workplace</span><h4>The 60-second reset</h4><p>Micro-breaks re-activate posture muscles, reset tension and recharge focus — a minute you shouldn't skip.</p></article>
+    <article class="insight"><div class="i-img"><img src="assets/img/post-sleep-1.jpg" alt="" loading="lazy"></div><span class="mono">Recovery</span><h4>Sleep, the forgotten therapy</h4><p>Deep sleep repairs tissue and regulates pain sensitivity. Patients who sleep well heal better.</p></article>
+    <article class="insight"><div class="i-img"><img src="assets/img/post-ageing-1.jpg" alt="" loading="lazy"></div><span class="mono">Active Ageing</span><h4>You grow old when you stop moving</h4><p>Movement, purpose and connection protect strength, balance and memory.</p></article>
+    <article class="insight"><div class="i-img"><img src="assets/img/post-mind-1.jpg" alt="" loading="lazy"></div><span class="mono">Mind–Body</span><h4>Your body hears your mind</h4><p>Stress and fear amplify pain signals. When the patient feels heard, healing begins.</p></article>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="contact" id="contact">
+  <div class="section-label mono"><span>08</span> Connect</div>
+  <h2 class="contact-title"><span class="line"><span class="split">Let's move</span></span><span class="line"><span class="split italic">better, together.</span></span></h2>
+  <div class="contact-row">
+    <p class="reveal-up">For conferences, guest lectures, workshops, research collaboration or clinical consultation.</p>
+    <a class="big-btn" href="https://www.linkedin.com/in/tajuddin-chitapure-69140a60/" target="_blank" rel="noopener" data-magnetic data-cursor="Open">
+      <span>Connect on LinkedIn</span><i>↗</i>
+    </a>
+  </div>
+  <div class="contact-meta mono">
+    <span>MGM School of Physiotherapy, Chhatrapati Sambhajinagar, Maharashtra</span>
+    <span>3,400+ followers on LinkedIn</span>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-name">Tajuddin<em>Chitapure</em></div>
+  <div class="footer-row mono">
+    <span>© <span id="yr"></span> Dr. Tajuddin Chitapure (PT)</span>
+    <a href="#top" class="to-top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="main.js"></script>
+<script type="module" src="spine.js"></script>
+</body>
+</html>
