@@ -387,7 +387,7 @@ if (!isTouch) {
 }
 
 /* ---------- gallery parallax ---------- */
-$$('.gcol').forEach(c => gsap.fromTo(c, { yPercent: -(+c.dataset.speed) }, { yPercent: +c.dataset.speed, ease: 'none', scrollTrigger: { trigger: '.gallery', start: 'top bottom', end: 'bottom top', scrub: true } }));
+if (innerWidth > 860) $$('.gcol').forEach(c => gsap.fromTo(c, { yPercent: -(+c.dataset.speed) }, { yPercent: +c.dataset.speed, ease: 'none', scrollTrigger: { trigger: '.gallery', start: 'top bottom', end: 'bottom top', scrub: true } }));
 
 /* ---------- insights drag ---------- */
 (() => {
