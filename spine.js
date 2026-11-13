@@ -252,9 +252,9 @@ function release() {
 addEventListener('pointermove', e => {
   ptr.x = e.clientX; ptr.y = e.clientY; ptr.has = true;
   ptr.blocked = !!(e.target.closest && e.target.closest(INTERACTIVE));
-  if (ptr.down && e.pointerType === 'mouse') {
+  if (ptr.down && (e.pointerType === 'mouse' || explodeT)) {
     const dx = e.clientX - ptr.lastX; ptr.lastX = e.clientX;
-    if (!ptr.dragging && Math.hypot(e.clientX - ptr.startX, e.clientY - ptr.startY) > 7) { ptr.dragging = true; clearTimeout(ptr.timer); }
+    if (!ptr.dragging && Math.hypot(e.clientX - ptr.startX, e.clientY - ptr.startY) > 7) { ptr.dragging = true; if (e.pointerType === 'mouse') clearTimeout(ptr.timer); }
     if (ptr.dragging) { dragV = dx * 0.012; dragYaw += dragV; }
   }
 });
@@ -267,6 +267,8 @@ addEventListener('pointerdown', e => {
   clearTimeout(ptr.timer);
   ptr.timer = setTimeout(() => { if (ptr.down) { explodeT = 1; if (!used) { used = true; document.body.classList.add('spine-used'); } } }, e.pointerType === 'mouse' ? 170 : 380);
 });
+// while holding (exploded) on a touch screen, fingers rotate the spine instead of scrolling/panning the page
+addEventListener('touchmove', e => { if (ptr.down && explodeT && e.cancelable) e.preventDefault(); }, { passive: false });
 addEventListener('pointerup', release);
 addEventListener('pointercancel', release);
 addEventListener('blur', release);
@@ -302,12 +304,12 @@ function frame() {
 
   // scroll choreography: rotate, drift left, tilt
   const mobLab = innerWidth < 860;
-  root.position.x = (layout.x + THREE.MathUtils.smoothstep(p, 0.1, 0.9) * 0.8) * (1 - Math.min(Math.max(explode, 0), 1) * 0.7) * (1 - labK * (mobLab ? 0.85 : 0.1));
-  root.position.y = Math.sin(t * 0.6) * 0.08 + p * 0.6 * (1 - labK) + labK * (innerWidth < 860 ? 1.5 : -0.1);
+  root.position.x = (layout.x + THREE.MathUtils.smoothstep(p, 0.1, 0.9) * 0.8) * (1 - Math.min(Math.max(explode, 0), 1) * 0.7) * (1 - labK * (mobLab ? 1.0 : 0.1));
+  root.position.y = Math.sin(t * 0.6) * 0.08 + p * 0.6 * (1 - labK) + labK * (innerWidth < 860 ? 1.0 : -0.1);
   // spring for the explode (small overshoot = elastic snap-back)
   expV += (explodeT - explode) * 0.1; expV *= 0.8; explode += expV;
   const ex = Math.max(explode, -0.08);
-  root.scale.setScalar(layout.scale * (1 + p * 0.12) * (1 - labK * 0.16) * (1 - Math.min(ex, 1.15) * 0.2));
+  root.scale.setScalar(layout.scale * (1 + p * 0.12) * (1 - labK * (innerWidth < 860 ? 0.42 : 0.16)) * (1 - Math.min(ex, 1.15) * 0.2));
   yawAuto += dt * 0.22 * (1 - Math.min(Math.max(ex, 0), 1) * 0.9);
   if (!ptr.dragging) { dragYaw += dragV; dragV *= 0.94; }
   const baseYaw = yawAuto + dragYaw + p * Math.PI * 1.6 + mouse.x * 0.5 * (1 - Math.min(Math.max(ex, 0), 1));

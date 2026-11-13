@@ -372,21 +372,7 @@ body.spine-exploded .hero-spec,body.spine-exploded .hero-tags,body.spine-explode
 .spine-labels{z-index:6}
 body.spine-exploded .nav,body.spine-exploded .side-nav{opacity:.25;transition:opacity .4s}
 
-/* ---------- X-ray lens on portrait ---------- */
 .portrait-frame{position:relative}
-.xr{position:absolute;inset:0;overflow:hidden;pointer-events:none;
-  --x:50%;--y:40%;--r:0px;
-  -webkit-mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),#000 62%,transparent 100%);mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),#000 62%,transparent 100%)}
-.xr img{width:100%;height:120%;object-fit:cover;object-position:center 20%;filter:grayscale(1) invert(1) contrast(1.9) brightness(1.15) sepia(1) hue-rotate(165deg) saturate(2.6)}
-.xr::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(124,240,212,.10) 0 1px,transparent 1px 3px);mix-blend-mode:screen}
-.xr-ring{position:absolute;left:0;top:0;width:var(--rd,0px);height:var(--rd,0px);margin:calc(var(--rd,0px) / -2) 0 0 calc(var(--rd,0px) / -2);border:1px solid var(--signal);border-radius:50%;pointer-events:none;opacity:0;box-shadow:0 0 24px rgba(124,240,212,.25),inset 0 0 24px rgba(124,240,212,.12)}
-.xr-ring::before,.xr-ring::after{content:"";position:absolute;background:var(--signal);opacity:.6}
-.xr-ring::before{left:50%;top:-6px;bottom:-6px;width:1px}
-.xr-ring::after{top:50%;left:-6px;right:-6px;height:1px}
-.xr-hint{position:absolute;left:14px;bottom:14px;color:var(--signal);background:rgba(7,9,12,.55);padding:6px 10px;border-radius:99px;backdrop-filter:blur(6px);pointer-events:none;transition:opacity .5s}
-.xr-hint b{font-weight:400}.xr-hint .t{display:none}
-.portrait.xr-on .xr-hint{opacity:0}
-@media (hover:none){.xr-hint .m{display:none}.xr-hint .t{display:inline}}
 
 /* ---------- Spine Lab ---------- */
 .lab{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;--pain:0}
@@ -418,3 +404,13 @@ body.spine-exploded .nav,body.spine-exploded .side-nav{opacity:.25;transition:op
 .lab .sub{margin-top:14px}
 .lab-panel{margin-top:22px}
 @media (max-width:860px){.lab .h-xl{font-size:clamp(40px,12vw,64px)}}
+
+/* ---------- mobile safety: never scroll sideways ---------- */
+html,body{overflow-x:clip;max-width:100%}
+.spine-labels,.spine-dim{overflow:hidden}
+body.spine-hold,body.spine-exploded{overscroll-behavior:none}
+@media (max-width:860px){
+  .lab{min-height:100svh;padding-top:84px;padding-bottom:20px}
+  .lab-panel{margin-top:auto}
+  .portrait-ring{right:-4px;top:-26px;width:90px}
+}
