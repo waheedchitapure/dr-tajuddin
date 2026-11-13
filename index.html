@@ -189,6 +189,7 @@
           <circle cx="164" cy="592" r="8"/><circle cx="236" cy="592" r="8"/>
           <circle cx="162" cy="742" r="5"/><circle cx="238" cy="742" r="5"/>
         </g>
+        <g class="rom"><path class="rom-arc"/><line class="rom-line"/><circle class="rom-dot" r="3.5"/><text class="rom-txt" text-anchor="middle">0</text></g>
         <g class="hotspots">
           <g class="hs" data-id="neck" transform="translate(200 160)"><circle class="hs-glow" r="26" fill="url(#glow)"/><circle class="hs-pulse" r="10"/><circle class="hs-core" r="5"/></g>
           <g class="hs" data-id="shoulder" transform="translate(278 182)"><circle class="hs-glow" r="26" fill="url(#glow)"/><circle class="hs-pulse" r="10"/><circle class="hs-core" r="5"/></g>
@@ -210,6 +211,7 @@
         <div><h4 class="mono">Clinical clues</h4><ul class="cp-clues"></ul></div>
         <div><h4 class="mono">Rehab approach</h4><ul class="cp-rehab"></ul></div>
       </div>
+      <div class="cp-rom"><div class="mono cp-rom-top"><span class="cp-rom-name">Range of motion</span><span class="cp-rom-val"><b>0</b>&deg; / <i>180</i>&deg;</span></div><div class="cp-rom-bar"><span></span></div></div>
       <div class="cp-img"><img alt=""></div>
       <div class="cp-nav">
         <button class="cp-btn" data-dir="-1" aria-label="Previous">←</button>
@@ -341,6 +343,7 @@
 </section>
 
 <!-- ============ GALLERY ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="ripple" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="rippleNoise" type="fractalNoise" baseFrequency="0.01 0.018" numOctaves="2" seed="4" result="n"/><feDisplacementMap id="rippleMap" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
 <section class="gallery">
   <div class="gallery-cols">
     <div class="gcol" data-speed="-12">
@@ -380,6 +383,20 @@
     <article class="insight"><div class="i-img"><img src="assets/img/post-sleep-1.jpg" alt="" loading="lazy"></div><span class="mono">Recovery</span><h4>Sleep, the forgotten therapy</h4><p>Deep sleep repairs tissue and regulates pain sensitivity. Patients who sleep well heal better.</p></article>
     <article class="insight"><div class="i-img"><img src="assets/img/post-ageing-1.jpg" alt="" loading="lazy"></div><span class="mono">Active Ageing</span><h4>You grow old when you stop moving</h4><p>Movement, purpose and connection protect strength, balance and memory.</p></article>
     <article class="insight"><div class="i-img"><img src="assets/img/post-mind-1.jpg" alt="" loading="lazy"></div><span class="mono">Mind–Body</span><h4>Your body hears your mind</h4><p>Stress and fear amplify pain signals. When the patient feels heard, healing begins.</p></article>
+  </div>
+</section>
+
+<!-- ============ BREATHE ============ -->
+<section class="breathe" id="breathe">
+  <div class="section-label mono"><span>&#9676;</span> Take 30 seconds</div>
+  <h2 class="h-xl"><span class="split">Pain eases</span> <span class="split italic">when you breathe.</span></h2>
+  <div class="breathe-stage">
+    <div class="b-orb" id="bOrb"><i class="b-halo"></i><i class="b-ring"></i><div class="b-core"><span class="mono" id="bPhase">Ready</span><b id="bTime">30</b></div></div>
+    <div class="b-ctrl">
+      <button class="b-btn" id="bStart" type="button">Start</button>
+      <label class="b-sound mono"><input type="checkbox" id="bSound"><span></span>Heartbeat sound</label>
+    </div>
+    <p class="b-note">Slow breathing calms the nervous system and turns down the body's pain alarm. Breathe in for 4, out for 6.</p>
   </div>
 </section>
 

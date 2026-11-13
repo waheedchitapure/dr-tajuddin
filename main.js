@@ -79,8 +79,9 @@ function heroIntro() {
 /* ---------- generic reveals ---------- */
 $$('.split').forEach(el => {
   if (el.closest('.hero')) return;
-  gsap.from($$('.w > span', el), {
-    yPercent: 110, duration: 1.1, ease: 'expo.out', stagger: .06,
+  $$('.w > span', el).forEach(w => { w.innerHTML = [...w.textContent].map(ch => `<span class="c">${ch}</span>`).join(''); });
+  gsap.from($$('.c', el), {
+    yPercent: 120, rotate: 6, duration: .9, ease: 'expo.out', stagger: { each: .018, from: 'start' },
     scrollTrigger: { trigger: el, start: 'top 88%' }
   });
 });
@@ -214,11 +215,49 @@ $$('.hs').forEach(h => h.addEventListener('click', () => {
 }));
 $$('.cp-btn').forEach(b => b.addEventListener('click', () => { showCondition(current + +b.dataset.dir, +b.dataset.dir); stopAuto(); }));
 showCondition(0);
+/* ---- range of motion on the active joint ---- */
+const ROM = {
+  neck:{n:'Cervical rotation',max:80,a0:-90,d:1}, shoulder:{n:'Shoulder abduction',max:180,a0:90,d:-1},
+  elbow:{n:'Elbow flexion',max:145,a0:90,d:1}, wrist:{n:'Wrist flexion',max:80,a0:90,d:1},
+  back:{n:'Lumbar flexion',max:60,a0:-90,d:1}, knee:{n:'Knee flexion',max:135,a0:90,d:-1},
+  foot:{n:'Ankle dorsiflexion',max:20,a0:0,d:-1}
+};
+let romTw = null;
+const romO = { v: 0 };
+function setRom(id) {
+  const r = ROM[id]; if (!r) return;
+  const hs = $(`.hs[data-id="${id}"]`);
+  const m = /translate\(([\d.]+)\s+([\d.]+)\)/.exec(hs.getAttribute('transform'));
+  const cx = +m[1], cy = +m[2], R = 38, rad = a => a * Math.PI / 180;
+  const pt = (a, rr) => [cx + rr * Math.cos(rad(a)), cy + rr * Math.sin(rad(a))];
+  const arc = $('.rom-arc'), line = $('.rom-line'), dot = $('.rom-dot'), txt = $('.rom-txt');
+  const panel = $('.condition-panel');
+  $('.cp-rom-name', panel).textContent = r.n;
+  $('.cp-rom-val i', panel).textContent = r.max;
+  const val = $('.cp-rom-val b', panel), bar = $('.cp-rom-bar span', panel);
+  if (romTw) romTw.kill();
+  romO.v = 0;
+  const draw = () => {
+    const v = romO.v, a1 = r.a0 + r.d * v * r.max;
+    const [x0, y0] = pt(r.a0, R), [x1, y1] = pt(a1, R), [lx, ly] = pt(a1, R + 10);
+    arc.setAttribute('d', `M${cx} ${cy} L${x0} ${y0} A${R} ${R} 0 ${v * r.max > 180 ? 1 : 0} ${r.d > 0 ? 1 : 0} ${x1} ${y1} Z`);
+    line.setAttribute('x1', cx); line.setAttribute('y1', cy); line.setAttribute('x2', lx); line.setAttribute('y2', ly);
+    dot.setAttribute('cx', lx); dot.setAttribute('cy', ly);
+    const t = pt(r.a0 + r.d * v * r.max * .5, R + 22);
+    txt.setAttribute('x', t[0]); txt.setAttribute('y', t[1] + 4); txt.textContent = Math.round(v * r.max) + '\u00b0';
+    val.textContent = Math.round(v * r.max); bar.style.width = (v * 100) + '%';
+  };
+  draw();
+  romTw = gsap.to(romO, { v: 1, duration: 2.2, ease: 'sine.inOut', yoyo: true, repeat: -1, repeatDelay: .25, onUpdate: draw });
+}
+$$('.hs').forEach(h => h.addEventListener('click', () => setRom(h.dataset.id)));
+$$('.cp-btn').forEach(b => b.addEventListener('click', () => setRom(order[current])));
+setRom(order[0]);
 let autoTimer = null;
 const stopAuto = () => { clearInterval(autoTimer); autoTimer = null; };
 ScrollTrigger.create({
   trigger: '.bodymap', start: 'top 60%', end: 'bottom 20%',
-  onEnter: () => { if (!autoTimer && autoTimer !== false) autoTimer = setInterval(() => showCondition(current + 1), 5200); },
+  onEnter: () => { if (!autoTimer && autoTimer !== false) autoTimer = setInterval(() => { showCondition(current + 1); setRom(order[current]); }, 5200); },
   onLeave: stopAuto, onLeaveBack: stopAuto
 });
 $('.bodymap').addEventListener('pointerdown', () => { stopAuto(); autoTimer = false; }, { once: true });
@@ -454,3 +493,54 @@ window.addEventListener('load', () => ScrollTrigger.refresh());
   }));
   sync();
 }
+
+/* ==========================================================
+   PHASE 3: gallery ripple, breathing widget
+   ========================================================== */
+(() => {
+  if (matchMedia('(hover:hover)').matches) {
+    const map = $('#rippleMap'), noise = $('#rippleNoise');
+    const st = { s: 0, f: .01 };
+    let tw;
+    $$('.gcol img').forEach(img => img.addEventListener('mouseenter', () => {
+      if (tw) tw.kill();
+      tw = gsap.timeline({ onUpdate: () => { map.setAttribute('scale', st.s); noise.setAttribute('baseFrequency', `${st.f} ${st.f * 1.8}`); } })
+        .fromTo(st, { s: 0, f: .006 }, { s: 46, f: .014, duration: .45, ease: 'power2.out' })
+        .to(st, { s: 0, f: .02, duration: 1.4, ease: 'elastic.out(1,.4)' });
+    }));
+  }
+
+  const orb = $('#bOrb'); if (!orb) return;
+  const ring = $('.b-ring', orb), halo = $('.b-halo', orb), phase = $('#bPhase'), time = $('#bTime'), btn = $('#bStart'), snd = $('#bSound');
+  let ctx, running = false, tl, tick, hb;
+  gsap.set([ring, halo], { scale: .62 });
+  const beat = () => {
+    if (!snd.checked) return;
+    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+    const thump = (d, f, g) => {
+      const t = ctx.currentTime + d, o = ctx.createOscillator(), a = ctx.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(40, t + .18);
+      a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(g, t + .02); a.gain.exponentialRampToValueAtTime(.001, t + .22);
+      o.connect(a).connect(ctx.destination); o.start(t); o.stop(t + .25);
+    };
+    thump(0, 70, .35); thump(.28, 58, .22);
+  };
+  const stop = done => {
+    running = false; clearInterval(tick); clearInterval(hb); if (tl) tl.kill();
+    gsap.to([ring, halo], { scale: .62, duration: .8, ease: 'power2.out' });
+    phase.textContent = done ? 'Well done' : 'Ready'; time.textContent = done ? '\u2713' : '30';
+    btn.textContent = done ? 'Again' : 'Start';
+  };
+  btn.addEventListener('click', () => {
+    if (running) { stop(false); return; }
+    running = true; btn.textContent = 'Stop';
+    let left = 30; time.textContent = left;
+    tick = setInterval(() => { left--; time.textContent = Math.max(left, 0); if (left <= 0) stop(true); }, 1000);
+    hb = setInterval(beat, 1000); beat();
+    tl = gsap.timeline({ repeat: -1 });
+    tl.add(() => { phase.textContent = 'Breathe in'; })
+      .to([ring, halo], { scale: 1, duration: 4, ease: 'sine.inOut' })
+      .add(() => { phase.textContent = 'Breathe out'; })
+      .to([ring, halo], { scale: .62, duration: 6, ease: 'sine.inOut' });
+  });
+})();
