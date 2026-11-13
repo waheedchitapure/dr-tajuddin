@@ -455,3 +455,4 @@ body.spine-hold,body.spine-exploded{overscroll-behavior:none}
 .crowd-cap span{color:var(--dim);display:block;max-width:190px;margin-left:auto;margin-top:6px}
 @media (max-width:860px){.stat-crowd{grid-template-columns:1fr}.crowd-cap{text-align:left}.crowd-cap span{margin-left:0}.crowd{grid-template-columns:repeat(25,1fr)}}
 .stats .stat:last-child{grid-column:1/-1}
+.contact-meta a{color:var(--bone);border-bottom:1px solid var(--nerve)}
