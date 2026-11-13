@@ -389,3 +389,31 @@ if (!isTouch) {
 
 if (reduce) { gsap.globalTimeline.timeScale(20); }
 window.addEventListener('load', () => ScrollTrigger.refresh());
+
+/* ==========================================================
+   SIDE SCROLL-SPINE NAV — one vertebra per section
+   ========================================================== */
+{
+  const items = [['.hero', 'Intro'], ['#about', 'About'], ['#expertise', 'Expertise'], ['#pathway', 'Pain pathway'], ['#journey', 'Journey'], ['#awards', 'Awards'], ['#stage', 'Speaking'], ['#insights', 'Insights'], ['#contact', 'Connect']]
+    .map(([sel, name]) => ({ el: $(sel), name })).filter(x => x.el);
+  const nav = document.createElement('nav');
+  nav.className = 'side-nav'; nav.setAttribute('aria-label', 'Sections');
+  const links = items.map((it, i) => {
+    const a = document.createElement('a');
+    a.href = it.el.id ? '#' + it.el.id : '#top';
+    a.innerHTML = `<span>${it.name}</span><i></i>`;
+    a.addEventListener('click', e => { e.preventDefault(); lenis.scrollTo(it.el, { offset: 0, duration: 1.6 }); });
+    nav.appendChild(a); return a;
+  });
+  document.body.appendChild(nav);
+  const setActive = i => {
+    links.forEach((a, k) => a.classList.toggle('is-active', k === i));
+    nav.style.setProperty('--fill', (i / (items.length - 1) * 100) + '%');
+  };
+  setActive(0);
+  items.forEach((it, i) => ScrollTrigger.create({
+    trigger: it.el, start: 'top 50%', end: 'bottom 50%',
+    onEnter: () => setActive(i), onEnterBack: () => setActive(i)
+  }));
+  ScrollTrigger.create({ trigger: '.hero', start: 'top -4%', onToggle: s => nav.classList.toggle('on', s.isActive), end: 'max' });
+}

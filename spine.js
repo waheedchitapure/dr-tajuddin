@@ -25,6 +25,7 @@ const rim2 = new THREE.PointLight(0x7cf0d4, 18, 18); rim2.position.set(4, -3, -2
 
 /* ---------- materials ---------- */
 const boneMat = new THREE.MeshPhysicalMaterial({ color: 0xe9e1cf, roughness: 0.48, metalness: 0.0, clearcoat: 0.35, clearcoatRoughness: 0.5, sheen: 0.4, sheenColor: new THREE.Color(0xffd9c2) });
+const bones = []; // every bone material (one per vertebra) — xray + glow act on all
 const wireMat = new THREE.MeshBasicMaterial({ color: 0x7cf0d4, wireframe: true, transparent: true, opacity: 0 });
 const discMat = new THREE.MeshStandardMaterial({ color: 0xff5b2e, emissive: 0xff3a10, emissiveIntensity: 0.9, roughness: 0.4, transparent: true, opacity: 0.92 });
 const cordMat = new THREE.MeshStandardMaterial({ color: 0xffb08f, emissive: 0xff5b2e, emissiveIntensity: 1.4, transparent: true, opacity: 0.55 });
@@ -69,24 +70,25 @@ for (let i = 0; i < N; i++) {
   const s = 0.36 + Math.pow(i / (N - 1), 1.15) * 0.42;
   const v = new THREE.Group();
   const height = (H / (N + 1.6)) * 0.62 / s;
+  const vm = boneMat.clone(); bones.push(vm); // own material so each bone can glow alone
 
-  const body = new THREE.Mesh(bodyGeo, boneMat); body.scale.set(1, height, 1);
-  const top = new THREE.Mesh(capGeo, boneMat); top.rotation.x = -Math.PI / 2; top.position.y = height / 2; top.scale.set(.96, .82, 1);
+  const body = new THREE.Mesh(bodyGeo, vm); body.scale.set(1, height, 1);
+  const top = new THREE.Mesh(capGeo, vm); top.rotation.x = -Math.PI / 2; top.position.y = height / 2; top.scale.set(.96, .82, 1);
   const bot = top.clone(); bot.rotation.x = Math.PI / 2; bot.position.y = -height / 2;
   v.add(body, top, bot);
 
   // posterior arch (behind body = -z)
-  const arch = new THREE.Mesh(archGeo, boneMat);
+  const arch = new THREE.Mesh(archGeo, vm);
   arch.rotation.x = Math.PI / 2; arch.rotation.z = Math.PI * -0.1 + Math.PI; arch.position.set(0, 0, -0.62);
   v.add(arch);
   // spinous process pointing back & down
-  const sp = new THREE.Mesh(spinousGeo, boneMat);
+  const sp = new THREE.Mesh(spinousGeo, vm);
   sp.rotation.x = -Math.PI / 2 - (i < 7 ? 0.3 : i < 19 ? 0.7 : 0.25);
   sp.position.set(0, -0.12, -1.2);
   v.add(sp);
   // transverse processes
   [-1, 1].forEach(side => {
-    const tp = new THREE.Mesh(transGeo, boneMat);
+    const tp = new THREE.Mesh(transGeo, vm);
     tp.rotation.z = Math.PI / 2 + side * 0.25; tp.position.set(side * 0.62, 0.02, -0.62);
     v.add(tp);
   });
@@ -98,7 +100,7 @@ for (let i = 0; i < N; i++) {
   v.position.copy(p);
   // align local Y with tangent (pointing down the spine)
   v.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), tan.clone().normalize());
-  v.userData = { base: v.position.clone(), i };
+  v.userData = { base: v.position.clone(), i, ky: (i - N / 2) / N, q0: v.quaternion.clone(), mat: vm, glow: 0 };
   spine.add(v); vertebrae.push(v);
 
   // disc below (except last)
@@ -109,7 +111,7 @@ for (let i = 0; i < N; i++) {
     d.position.copy(dp);
     d.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), curve.getTangentAt(t2));
     d.scale.setScalar(s * 1.02);
-    d.userData = { base: d.position.clone(), i };
+    d.userData = { base: d.position.clone(), i, disc: true, ky: (i + 0.5 - N / 2) / N };
     spine.add(d); vertebrae.push(d);
   }
 }
@@ -121,11 +123,12 @@ for (let i = 0; i < N; i++) {
   shape.moveTo(-0.75, 0); shape.quadraticCurveTo(-0.7, -0.9, 0, -1.45); shape.quadraticCurveTo(0.7, -0.9, 0.75, 0); shape.quadraticCurveTo(0, 0.22, -0.75, 0);
   const g = new THREE.ExtrudeGeometry(shape, { depth: 0.38, bevelEnabled: true, bevelThickness: 0.12, bevelSize: 0.1, bevelSegments: 4, curveSegments: 24 });
   g.center();
-  const sac = new THREE.Mesh(g, boneMat);
+  const sacMat = boneMat.clone(); bones.push(sacMat);
+  const sac = new THREE.Mesh(g, sacMat);
   sac.position.copy(p).add(new THREE.Vector3(0, -0.3, -0.15));
   sac.rotation.x = 0.35;
   sac.scale.set(0.62, 0.62, 0.5);
-  sac.userData = { base: sac.position.clone(), i: N };
+  sac.userData = { base: sac.position.clone(), i: N, ky: 0.5, q0: sac.quaternion.clone(), mat: sacMat, glow: 0 };
   spine.add(sac); vertebrae.push(sac);
 }
 
@@ -192,9 +195,85 @@ addEventListener('resize', resize); resize();
 const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
 addEventListener('pointermove', e => { mouse.tx = (e.clientX / innerWidth - 0.5) * 2; mouse.ty = (e.clientY / innerHeight - 0.5) * 2; });
 
+/* ---------- interaction: hover glow, hold = explode, drag = rotate ---------- */
+const REG = [
+  { name: 'Cervical', where: 'neck', col: new THREE.Color(0x7cf0d4), note: 'Carries the head and drives neck pain, stiffness and headaches.' },
+  { name: 'Thoracic', where: 'mid-back', col: new THREE.Color(0xffc46b), note: 'Anchors the ribs. Least mobile, so it stiffens with desk posture.' },
+  { name: 'Lumbar', where: 'low back', col: new THREE.Color(0xff5b2e), note: 'Takes the most load. The most common site of back pain.' },
+  { name: 'Sacral', where: 'pelvis', col: new THREE.Color(0xb58cff), note: 'The base of the spine, locking into the pelvis.' }
+];
+const regOf = i => i < 7 ? 0 : i < 19 ? 1 : i < 24 ? 2 : 3;
+const nameOf = i => i < 7 ? 'C' + (i + 1) : i < 19 ? 'T' + (i - 6) : i < 24 ? 'L' + (i - 18) : 'S';
+const NERVE = new THREE.Color(0xff5b2e);
+const isTouchDev = matchMedia('(hover: none)').matches;
+
+// DOM helpers (labels while exploded + tooltip)
+const labelsBox = document.createElement('div'); labelsBox.className = 'spine-labels'; document.body.appendChild(labelsBox);
+const labelEls = [];
+for (let i = 0; i <= N; i++) {
+  const el = document.createElement('span'); el.className = 'spine-label';
+  const r = REG[regOf(i)];
+  const first = i === 0 || i === 7 || i === 19 || i === N;
+  el.innerHTML = nameOf(i) + (first ? '<em>' + r.name + '</em>' : '');
+  el.style.setProperty('--c', '#' + r.col.getHexString());
+  labelsBox.appendChild(el); labelEls.push(el);
+}
+const tip = document.createElement('div'); tip.className = 'spine-tip'; document.body.appendChild(tip);
+let tipIdx = -2;
+
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+const ptr = { x: 0, y: 0, has: false, blocked: false, down: false, dragging: false, lastX: 0, startX: 0, startY: 0, timer: 0 };
+let hoverIdx = -1, explode = 0, explodeT = 0, expV = 0, dragYaw = 0, dragV = 0, yawAuto = 0, used = false;
+const INTERACTIVE = 'a,button,input,textarea,select,.mobile-menu,.nav,.side-nav,[data-drag],[data-magnetic]';
+const canvasOn = () => parseFloat(getComputedStyle(canvas).opacity) > 0.3 && !document.body.classList.contains('menu-open');
+
+function pickIndex() {
+  ndc.set(ptr.x / innerWidth * 2 - 1, -(ptr.y / innerHeight) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hits = ray.intersectObjects(vertebrae, true);
+  for (const h of hits) { let o = h.object; while (o && o.userData.i === undefined) o = o.parent; if (o) return o.userData.i; }
+  return -1;
+}
+const cursorEl = document.querySelector('.cursor'), cursorLbl = document.querySelector('.cursor-label');
+let cursorOwned = false;
+function setCursor(on, text) {
+  if (!cursorEl || isTouchDev) return;
+  if (on) { cursorLbl.textContent = text; cursorEl.classList.add('is-label'); cursorOwned = true; }
+  else if (cursorOwned) { cursorEl.classList.remove('is-label'); cursorOwned = false; }
+}
+
+function release() {
+  clearTimeout(ptr.timer);
+  if (ptr.down) { ptr.down = false; ptr.dragging = false; explodeT = 0; document.body.classList.remove('spine-hold'); }
+}
+addEventListener('pointermove', e => {
+  ptr.x = e.clientX; ptr.y = e.clientY; ptr.has = true;
+  ptr.blocked = !!(e.target.closest && e.target.closest(INTERACTIVE));
+  if (ptr.down && e.pointerType === 'mouse') {
+    const dx = e.clientX - ptr.lastX; ptr.lastX = e.clientX;
+    if (!ptr.dragging && Math.hypot(e.clientX - ptr.startX, e.clientY - ptr.startY) > 7) { ptr.dragging = true; clearTimeout(ptr.timer); }
+    if (ptr.dragging) { dragV = dx * 0.012; dragYaw += dragV; }
+  }
+});
+addEventListener('pointerdown', e => {
+  if (e.button > 0 || !canvasOn() || (e.target.closest && e.target.closest(INTERACTIVE))) return;
+  ptr.x = e.clientX; ptr.y = e.clientY; ptr.has = true;
+  if (pickIndex() < 0) return;
+  ptr.down = true; ptr.dragging = false; ptr.lastX = ptr.startX = e.clientX; ptr.startY = e.clientY; dragV = 0;
+  document.body.classList.add('spine-hold');
+  clearTimeout(ptr.timer);
+  ptr.timer = setTimeout(() => { if (ptr.down) { explodeT = 1; if (!used) { used = true; document.body.classList.add('spine-used'); } } }, e.pointerType === 'mouse' ? 170 : 380);
+});
+addEventListener('pointerup', release);
+addEventListener('pointercancel', release);
+addEventListener('blur', release);
+document.addEventListener('pointerleave', () => { ptr.has = false; });
+addEventListener('contextmenu', e => { if (ptr.down) e.preventDefault(); });
+
 /* ---------- loop ---------- */
 const clock = new THREE.Clock();
-let xray = 0, visible = true;
+let xray = 0, visible = true, frameN = 0, lastMs = performance.now();
+const tmpQ = new THREE.Quaternion(), tmpV = new THREE.Vector3(), AXY = new THREE.Vector3(0, 1, 0);
 const io = new IntersectionObserver(() => {}, {});
 function frame() {
   requestAnimationFrame(frame);
@@ -202,31 +281,78 @@ function frame() {
   if (op < 0.01) { visible = false; return; }
   visible = true;
   const t = clock.getElapsedTime();
-  const st = window.__spine || { progress: 0, xray: 0 };
+  const nowMs = performance.now(); const dt = Math.min((nowMs - lastMs) / 1000, 0.05); lastMs = nowMs;
+  const st =window.__spine || { progress: 0, xray: 0 };
   const p = st.progress;
 
   mouse.x += (mouse.tx - mouse.x) * 0.05; mouse.y += (mouse.ty - mouse.y) * 0.05;
 
   // scroll choreography: rotate, drift left, tilt
-  root.position.x = layout.x + THREE.MathUtils.smoothstep(p, 0.1, 0.9) * 0.8;
+  root.position.x = (layout.x + THREE.MathUtils.smoothstep(p, 0.1, 0.9) * 0.8) * (innerWidth < 860 ? 1 - Math.min(Math.max(explode, 0), 1) * 0.65 : 1);
   root.position.y = Math.sin(t * 0.6) * 0.08 + p * 0.6;
-  root.scale.setScalar(layout.scale * (1 + p * 0.12));
-  spine.rotation.y = t * 0.22 + p * Math.PI * 1.6 + mouse.x * 0.5;
+  // spring for the explode (small overshoot = elastic snap-back)
+  expV += (explodeT - explode) * 0.1; expV *= 0.8; explode += expV;
+  const ex = Math.max(explode, -0.08);
+  root.scale.setScalar(layout.scale * (1 + p * 0.12) * (1 - Math.min(ex, 1.15) * 0.36));
+  yawAuto += dt * 0.22 * (1 - Math.min(Math.max(ex, 0), 1) * 0.9);
+  if (!ptr.dragging) { dragYaw += dragV; dragV *= 0.94; }
+  spine.rotation.y = yawAuto + dragYaw + p * Math.PI * 1.6 + mouse.x * 0.5 * (1 - Math.min(Math.max(ex, 0), 1));
   spine.rotation.x = mouse.y * 0.18 + p * 0.25;
   spine.rotation.z = Math.sin(t * 0.4) * 0.03 - 0.05;
 
   // "breathing" separation of segments
   const spread = 0.06 * Math.sin(t * 1.2) + p * 0.35;
+  const fx = i => Math.sin(i * 2.3) * 0.32;
+  const onNow = canvasOn();
+  if (frameN++ % 3 === 0) {
+    if (onNow && ptr.has && !ptr.blocked && !ptr.dragging) hoverIdx = pickIndex();
+    else if (!ptr.down) hoverIdx = -1;
+  }
   vertebrae.forEach(m => {
-    const b = m.userData.base; const k = (m.userData.i - N / 2) / N;
-    m.position.set(b.x, b.y + k * spread * 2, b.z);
+    const u = m.userData, b = u.base, k = u.ky;
+    const xo = u.disc ? (fx(u.i) + fx(u.i + 1)) * 0.5 : fx(u.i);
+    m.position.set(b.x + xo * ex, b.y + (u.i - N / 2) / N * spread * 2 - k * ex * 3.3, b.z);
+    if (u.q0) {
+      m.quaternion.copy(u.q0).multiply(tmpQ.setFromAxisAngle(AXY, Math.sin(u.i * 1.7) * 0.55 * ex));
+      u.glow += ((hoverIdx === u.i ? 1 : 0) - u.glow) * 0.18;
+      const g = u.glow * 0.8 + Math.max(ex, 0) * 0.55;
+      u.mat.emissive.copy(ex > 0.04 ? REG[regOf(u.i)].col : NERVE);
+      u.mat.emissiveIntensity = g;
+    }
   });
+
+  // labels follow each bone while exploded
+  const showL = ex > 0.25;
+  labelsBox.classList.toggle("on", showL); document.body.classList.toggle("spine-exploded", showL);
+  if (showL) {
+    const a = Math.min(1, (ex - 0.25) * 2.2);
+    labelsBox.style.opacity = a;
+    const w = innerWidth / 2, h2 = innerHeight / 2;
+    vertebrae.forEach(m => {
+      const u = m.userData; if (u.disc) return;
+      m.getWorldPosition(tmpV); tmpV.project(camera);
+      labelEls[u.i].style.transform = `translate(${tmpV.x * w + w + 46 * layout.scale}px,${-tmpV.y * h2 + h2}px) translateY(-50%)`;
+    });
+  }
+
+  // tooltip (mouse only)
+  const tIdx = (!isTouchDev && hoverIdx >= 0 && !ptr.dragging && !ptr.down) ? hoverIdx : -1;
+  if (tIdx !== tipIdx) {
+    tipIdx = tIdx;
+    if (tIdx >= 0) {
+      const r = REG[regOf(tIdx)];
+      tip.innerHTML = `<b style="color:#${r.col.getHexString()}">${nameOf(tIdx)}</b><i>${r.name} · ${r.where}</i><p>${tIdx === 22 || tIdx === 23 ? 'L4–L5 is where most disc problems begin. ' : ''}${r.note}</p>`;
+    }
+    tip.classList.toggle('on', tIdx >= 0);
+  }
+  if (tIdx >= 0) tip.style.transform = `translate(${Math.min(ptr.x + 22, innerWidth - 250)}px,${Math.min(ptr.y + 18, innerHeight - 130)}px)`;
+  setCursor((hoverIdx >= 0 && !ptr.blocked && !ptr.dragging) || ptr.down, ptr.dragging ? 'Drag' : explodeT ? 'Release' : 'Hold');
 
   // x-ray toggle (contact section) + mid-scroll ghosting
   const targetX = st.xray;
   xray += (targetX - xray) * 0.06;
   wireMat.opacity = xray * 0.55;
-  boneMat.opacity = 1 - xray * 0.75; boneMat.transparent = xray > 0.01;
+  bones.forEach(m => { m.opacity = 1 - xray * 0.75; m.transparent = xray > 0.01; });
 
   // particles along the cord, travelling downward
   const arr = pGeo.attributes.position.array;
