@@ -94,13 +94,17 @@ $$('.section-label').forEach(el => gsap.from(el, { opacity: 0, x: -20, duration:
 gsap.to('.hero-title', { yPercent: -18, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
 
 /* ---------- 3D canvas visibility + progress ---------- */
-window.__spine = { progress: 0, xray: 0 };
+window.__spine = { progress: 0, xray: 0, lab: 0 };
+window.__lab = { slouch: 0, curve: 0, pain: 0 };
 ScrollTrigger.create({
   trigger: '.hero', start: 'top top', end: 'bottom top',
   onUpdate: s => { window.__spine.progress = s.progress; }
 });
 // fade the 3D spine out before the manifesto text so it never sits behind copy
 gsap.to('#spine', { opacity: 0, ease: 'none', scrollTrigger: { trigger: '.about', start: 'top 85%', end: 'top 35%', scrub: true } });
+gsap.fromTo('#spine', { opacity: 0 }, { opacity: 1, immediateRender: false, ease: 'none', scrollTrigger: { trigger: '.lab', start: 'top 80%', end: 'top 40%', scrub: true } });
+gsap.fromTo('#spine', { opacity: 1 }, { opacity: 0, immediateRender: false, ease: 'none', scrollTrigger: { trigger: '.expertise', start: 'top 90%', end: 'top 55%', scrub: true } });
+ScrollTrigger.create({ trigger: '.lab', start: 'top 60%', end: 'bottom 40%', onToggle: s => { window.__spine.lab = s.isActive ? 1 : 0; } });
 gsap.fromTo('#spine', { opacity: 0 }, { opacity: .35, immediateRender: false, ease: 'none', scrollTrigger: { trigger: '.contact', start: 'top 80%', end: 'top 20%', scrub: true } });
 ScrollTrigger.create({ trigger: '.contact', start: 'top 80%', onToggle: s => { window.__spine.xray = s.isActive ? 1 : 0; } });
 
@@ -394,7 +398,7 @@ window.addEventListener('load', () => ScrollTrigger.refresh());
    SIDE SCROLL-SPINE NAV — one vertebra per section
    ========================================================== */
 {
-  const items = [['.hero', 'Intro'], ['#about', 'About'], ['#expertise', 'Expertise'], ['#pathway', 'Pain pathway'], ['#journey', 'Journey'], ['#awards', 'Awards'], ['#stage', 'Speaking'], ['#insights', 'Insights'], ['#contact', 'Connect']]
+  const items = [['.hero', 'Intro'], ['#about', 'About'], ['#lab', 'Spine lab'], ['#expertise', 'Expertise'], ['#pathway', 'Pain pathway'], ['#journey', 'Journey'], ['#awards', 'Awards'], ['#stage', 'Speaking'], ['#insights', 'Insights'], ['#contact', 'Connect']]
     .map(([sel, name]) => ({ el: $(sel), name })).filter(x => x.el);
   const nav = document.createElement('nav');
   nav.className = 'side-nav'; nav.setAttribute('aria-label', 'Sections');
@@ -416,4 +420,74 @@ window.addEventListener('load', () => ScrollTrigger.refresh());
     onEnter: () => setActive(i), onEnterBack: () => setActive(i)
   }));
   ScrollTrigger.create({ trigger: '.hero', start: 'top -4%', onToggle: s => nav.classList.toggle('on', s.isActive), end: 'max' });
+}
+
+/* ==========================================================
+   SPINE LAB — sliders drive the 3D spine (spine.js reads window.__lab)
+   ========================================================== */
+{
+  const sl = $('#labSlouch'), cu = $('#labCurve'), pa = $('#labPain');
+  const slV = $('#labSlouchV'), cuV = $('#labCurveV'), paV = $('#labPainV'), note = $('#labNote'), lab = $('.lab');
+  const word = (v, a) => v < 12 ? a[0] : v < 45 ? a[1] : v < 78 ? a[2] : a[3];
+  const painNote = p => p < 1 ? 'No threat detected. The nervous system is quiet.'
+    : p < 4 ? 'A low alarm. Remember: pain is an estimate of threat, not a direct reading of tissue damage.'
+    : p < 7 ? 'The alarm is turning up. Sleep, stress and fear can amplify it, even when tissue is healthy.'
+    : 'A sensitised system. The volume knob is high. This is where pain education and graded loading help most.';
+  const posNote = (s, c) => s > 60 && c < 30 ? 'Long static slouching loads tissue, but posture alone rarely explains pain. Varied movement matters more.'
+    : c > 55 ? 'Side curves are common and often painless. Most people with scoliosis live and move normally.' : '';
+  const sync = () => {
+    const s = +sl.value, c = +cu.value, p = +pa.value;
+    window.__lab.slouch = s / 100; window.__lab.curve = c / 100; window.__lab.pain = p;
+    slV.textContent = word(s, ['Upright', 'Relaxed', 'Slouched', 'Collapsed']);
+    cuV.textContent = word(c, ['Straight', 'Slight', 'Curved', 'Scoliosis']);
+    paV.textContent = (p % 1 ? p.toFixed(1) : p) + ' / 10';
+    note.textContent = (p >= 4 ? painNote(p) : (posNote(s, c) || painNote(p)));
+    lab.style.setProperty('--pain', p / 10);
+    [sl, cu, pa].forEach(i => i.style.setProperty('--fill', (i.value - i.min) / (i.max - i.min) * 100 + '%'));
+  };
+  [sl, cu, pa].forEach(i => i.addEventListener('input', () => { $$('.lab-presets button').forEach(b => b.classList.remove('is-on')); sync(); }));
+  $$('.lab-presets button').forEach(b => b.addEventListener('click', () => {
+    const [s, c, p] = b.dataset.preset.split(',').map(Number);
+    $$('.lab-presets button').forEach(x => x.classList.toggle('is-on', x === b));
+    const o = { s: +sl.value, c: +cu.value, p: +pa.value };
+    gsap.to(o, { s, c, p, duration: 1.1, ease: 'power3.inOut', onUpdate: () => { sl.value = o.s; cu.value = o.c; pa.value = Math.round(o.p * 2) / 2; sync(); } });
+  }));
+  sync();
+}
+
+/* ==========================================================
+   X-RAY LENS on the portrait
+   ========================================================== */
+{
+  const portrait = $('.portrait'), frame = $('.portrait-frame'), xr = $('.xr'), ring = $('.xr-ring');
+  if (frame && xr) {
+    const st = { x: .5, y: .4, r: 0 };
+    const paint = () => {
+      const R = frame.clientWidth * .3;
+      xr.style.setProperty('--x', st.x * 100 + '%'); xr.style.setProperty('--y', st.y * 100 + '%'); xr.style.setProperty('--r', st.r * R + 'px');
+      ring.style.setProperty('--rd', st.r * R * 2 + 'px');
+      ring.style.left = st.x * 100 + '%'; ring.style.top = st.y * 100 + '%'; ring.style.opacity = Math.min(1, st.r * 1.4);
+    };
+    const open = () => { portrait.classList.add('xr-on'); gsap.to(st, { r: 1, duration: .5, ease: 'power3.out', onUpdate: paint }); };
+    const close = () => gsap.to(st, { r: 0, duration: .4, ease: 'power3.in', onUpdate: paint });
+    const move = e => {
+      const b = frame.getBoundingClientRect();
+      gsap.to(st, { x: (e.clientX - b.left) / b.width, y: (e.clientY - b.top) / b.height, duration: .25, ease: 'power2.out', onUpdate: paint, overwrite: 'auto' });
+    };
+    if (!isTouch) {
+      frame.addEventListener('pointerenter', e => { move(e); open(); });
+      frame.addEventListener('pointermove', move);
+      frame.addEventListener('pointerleave', close);
+    } else {
+      // touch: lens sweeps on its own while the photo is on screen; touching moves it
+      let sweep, touched = false;
+      const run = () => { sweep = gsap.timeline({ repeat: -1, yoyo: true, defaults: { ease: 'sine.inOut', onUpdate: paint } })
+        .to(st, { x: .72, y: .3, duration: 2.2 }).to(st, { x: .35, y: .62, duration: 2.2 }).to(st, { x: .6, y: .8, duration: 2.2 }); };
+      ScrollTrigger.create({ trigger: frame, start: 'top 75%', end: 'bottom 25%',
+        onEnter: () => { st.r = 0; open(); if (!touched) run(); }, onEnterBack: () => { open(); if (!touched) run(); },
+        onLeave: () => { sweep && sweep.kill(); close(); }, onLeaveBack: () => { sweep && sweep.kill(); close(); } });
+      frame.addEventListener('pointerdown', e => { touched = true; sweep && sweep.kill(); move(e); });
+      frame.addEventListener('pointermove', e => { if (touched) move(e); });
+    }
+  }
 }

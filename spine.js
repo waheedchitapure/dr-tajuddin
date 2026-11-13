@@ -111,7 +111,7 @@ for (let i = 0; i < N; i++) {
     d.position.copy(dp);
     d.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), curve.getTangentAt(t2));
     d.scale.setScalar(s * 1.02);
-    d.userData = { base: d.position.clone(), i, disc: true, ky: (i + 0.5 - N / 2) / N };
+    d.userData = { base: d.position.clone(), i, disc: true, dq0: d.quaternion.clone(), ky: (i + 0.5 - N / 2) / N };
     spine.add(d); vertebrae.push(d);
   }
 }
@@ -142,6 +142,8 @@ cordPts.unshift(cordPts[0].clone().add(new THREE.Vector3(0, 0.25, 0.02)));
 const cordCurve = new THREE.CatmullRomCurve3(cordPts);
 const cord = new THREE.Mesh(new THREE.TubeGeometry(cordCurve, 160, 0.06, 10, false), cordMat);
 spine.add(cord);
+const cordOrig = cord.geometry.attributes.position.array.slice();
+let cordKey = -1;
 
 /* ---------- nerve signal particles ---------- */
 const P = 70;
@@ -274,6 +276,12 @@ addEventListener('contextmenu', e => { if (ptr.down) e.preventDefault(); });
 /* ---------- loop ---------- */
 const clock = new THREE.Clock();
 let xray = 0, visible = true, frameN = 0, lastMs = performance.now();
+/* Spine Lab state: smoothed slouch / side-curve / pain, scaled by labK (0 outside the lab section) */
+const lv = { s: 0, c: 0, p: 0 }; let labK = 0, flow = 0;
+const DOWN = new THREE.Vector3(0, -1, 0), tmpD = new THREE.Vector3(), dq = new THREE.Quaternion(), tmpC = new THREE.Color(), RED = new THREE.Color(0xff0a0a), CORDRED = new THREE.Color(0xff2a1a), DISC0 = new THREE.Color(0xff3a10), CORD0 = new THREE.Color(0xff5b2e);
+const defX = t => lv.c * 1.3 * Math.sin(t * Math.PI * 2) * Math.pow(Math.max(Math.sin(t * Math.PI), 0), 0.6);
+const defZ = t => lv.s * (1.9 * Math.pow(1 - t, 2.4) - 1.4 * Math.exp(-Math.pow((t - 0.42) / 0.22, 2)));
+const wrapA = a => a - Math.PI * 2 * Math.round(a / (Math.PI * 2));
 const tmpQ = new THREE.Quaternion(), tmpV = new THREE.Vector3(), AXY = new THREE.Vector3(0, 1, 0);
 const io = new IntersectionObserver(() => {}, {});
 function frame() {
@@ -287,18 +295,26 @@ function frame() {
   const p = st.progress;
 
   mouse.x += (mouse.tx - mouse.x) * 0.05; mouse.y += (mouse.ty - mouse.y) * 0.05;
+  const L = window.__lab || { slouch: 0, curve: 0, pain: 0 };
+  labK += ((st.lab || 0) - labK) * 0.06;
+  lv.s += (L.slouch * labK - lv.s) * 0.08; lv.c += (L.curve * labK - lv.c) * 0.08; lv.p += (L.pain * labK - lv.p) * 0.08;
+  const pn = lv.p / 10, defOn = lv.s + lv.c > 0.002;
 
   // scroll choreography: rotate, drift left, tilt
-  root.position.x = (layout.x + THREE.MathUtils.smoothstep(p, 0.1, 0.9) * 0.8) * (1 - Math.min(Math.max(explode, 0), 1) * 0.7);
-  root.position.y = Math.sin(t * 0.6) * 0.08 + p * 0.6;
+  const mobLab = innerWidth < 860;
+  root.position.x = (layout.x + THREE.MathUtils.smoothstep(p, 0.1, 0.9) * 0.8) * (1 - Math.min(Math.max(explode, 0), 1) * 0.7) * (1 - labK * (mobLab ? 0.85 : 0.1));
+  root.position.y = Math.sin(t * 0.6) * 0.08 + p * 0.6 * (1 - labK) + labK * (innerWidth < 860 ? 1.5 : -0.1);
   // spring for the explode (small overshoot = elastic snap-back)
   expV += (explodeT - explode) * 0.1; expV *= 0.8; explode += expV;
   const ex = Math.max(explode, -0.08);
-  root.scale.setScalar(layout.scale * (1 + p * 0.12) * (1 - Math.min(ex, 1.15) * 0.2));
+  root.scale.setScalar(layout.scale * (1 + p * 0.12) * (1 - labK * 0.16) * (1 - Math.min(ex, 1.15) * 0.2));
   yawAuto += dt * 0.22 * (1 - Math.min(Math.max(ex, 0), 1) * 0.9);
   if (!ptr.dragging) { dragYaw += dragV; dragV *= 0.94; }
-  spine.rotation.y = yawAuto + dragYaw + p * Math.PI * 1.6 + mouse.x * 0.5 * (1 - Math.min(Math.max(ex, 0), 1));
-  spine.rotation.x = mouse.y * 0.18 + p * 0.25;
+  const baseYaw = yawAuto + dragYaw + p * Math.PI * 1.6 + mouse.x * 0.5 * (1 - Math.min(Math.max(ex, 0), 1));
+  const mag = Math.min((lv.s + lv.c) * 3, 1), wS = lv.s / (lv.s + lv.c + 1e-3);
+  const labYaw = 0.5 * (1 - mag) + mag * (wS * Math.PI * 0.46 + (1 - wS) * 0.1) + Math.sin(t * 0.5) * 0.06 + dragYaw + mouse.x * 0.15;
+  spine.rotation.y = baseYaw + wrapA(labYaw - baseYaw) * labK;
+  spine.rotation.x = (mouse.y * 0.18 + p * 0.25) * (1 - labK * 0.8);
   spine.rotation.z = Math.sin(t * 0.4) * 0.03 - 0.05;
 
   // "breathing" separation of segments
@@ -312,11 +328,16 @@ function frame() {
   vertebrae.forEach(m => {
     const u = m.userData, b = u.base, k = u.ky;
     const xo = u.disc ? (fx(u.i) + fx(u.i + 1)) * 0.5 : fx(u.i);
-    m.position.set(b.x + xo * ex, b.y + (u.i - N / 2) / N * spread * 2 - k * ex * 3.3, b.z);
+    const tt = u.t !== undefined ? u.t : (u.disc ? (u.i + 1) / (N + 1.6) : (u.i + 0.5) / (N + 1.6));
+    const dX = defOn ? defX(tt) : 0, dZ = defOn ? defZ(tt) : 0;
+    m.position.set(b.x + xo * ex + dX, b.y + (u.i - N / 2) / N * spread * 2 - k * ex * 3.3, b.z + dZ);
+    if (defOn) { const e = 0.01; tmpD.set((defX(tt + e) - defX(tt - e)) / (2 * e), -H, (defZ(tt + e) - defZ(tt - e)) / (2 * e)).normalize(); dq.setFromUnitVectors(DOWN, tmpD); } else dq.identity();
+    if (u.disc) m.quaternion.copy(dq).multiply(u.dq0);
     if (u.q0) {
-      m.quaternion.copy(u.q0).multiply(tmpQ.setFromAxisAngle(AXY, Math.sin(u.i * 1.7) * 0.55 * ex));
+      m.quaternion.copy(dq).multiply(u.q0).multiply(tmpQ.setFromAxisAngle(AXY, Math.sin(u.i * 1.7) * 0.55 * ex));
       u.glow += ((hoverIdx === u.i ? 1 : 0) - u.glow) * 0.18;
-      const g = u.glow * 0.8 + Math.max(ex, 0) * 0.55;
+      const pg = pn * (0.15 + 0.55 * Math.exp(-Math.pow((u.i - 21) / 4.5, 2))) * (0.6 + 0.4 * Math.sin(t * (3 + pn * 8) + u.i * 0.4));
+      const g = u.glow * 0.8 + Math.max(ex, 0) * 0.55 + pg;
       u.mat.emissive.copy(ex > 0.04 ? REG[regOf(u.i)].col : NERVE);
       u.mat.emissiveIntensity = g;
     }
@@ -359,16 +380,25 @@ function frame() {
   bones.forEach(m => { m.opacity = 1 - xray * 0.75; m.transparent = xray > 0.01; });
 
   // particles along the cord, travelling downward
+  flow += dt * (0.12 + pn * 0.9); pMat.size = 0.32 + pn * 0.4;
   const arr = pGeo.attributes.position.array;
   for (let i = 0; i < P; i++) {
-    const u = (pOff[i] + t * 0.12) % 1;
+    const u = (pOff[i] + flow) % 1;
     const q = cordCurve.getPointAt(u);
     const j = Math.sin(i * 12.9 + t * 3) * 0.04;
-    arr[i * 3] = q.x + j; arr[i * 3 + 1] = q.y; arr[i * 3 + 2] = q.z + j;
+    const tq = (H / 2 - q.y) / H;
+    arr[i * 3] = q.x + j + (defOn ? defX(tq) : 0); arr[i * 3 + 1] = q.y; arr[i * 3 + 2] = q.z + j + (defOn ? defZ(tq) : 0);
   }
   pGeo.attributes.position.needsUpdate = true;
-  discMat.emissiveIntensity = 0.7 + Math.sin(t * 2.4) * 0.3;
-  cordMat.emissiveIntensity = 1.2 + Math.sin(t * 3.1) * 0.4;
+  discMat.emissive.copy(DISC0).lerp(RED, pn); discMat.emissiveIntensity = 0.7 + Math.sin(t * (2.4 + pn * 7)) * (0.3 + pn * 0.4) + pn * 1.2;
+  cordMat.emissive.copy(CORD0).lerp(CORDRED, pn); cordMat.emissiveIntensity = 1.2 + Math.sin(t * 3.1) * 0.4 + pn * 2.2 * (0.6 + 0.4 * Math.sin(t * (4 + pn * 10)));
+  // bend the spinal cord to follow the vertebrae (only when sliders moved)
+  const key = Math.round((lv.s * 997 + lv.c * 1013) * 1000);
+  if (key !== cordKey) {
+    cordKey = key; const pa = cord.geometry.attributes.position, a = pa.array;
+    for (let i = 0; i < a.length; i += 3) { const tv = Math.min(Math.max((H / 2 - cordOrig[i + 1]) / H, 0), 1); a[i] = cordOrig[i] + defX(tv); a[i + 2] = cordOrig[i + 2] + defZ(tv); a[i + 1] = cordOrig[i + 1]; }
+    pa.needsUpdate = true;
+  }
 
   ring.rotation.z = t * 0.25; ring2.rotation.z = -t * 0.18;
   dust.rotation.y = t * 0.015 + mouse.x * 0.05;
