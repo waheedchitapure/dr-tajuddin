@@ -495,21 +495,9 @@ window.addEventListener('load', () => ScrollTrigger.refresh());
 }
 
 /* ==========================================================
-   PHASE 3: gallery ripple, breathing widget
+   PHASE 3: breathing widget
    ========================================================== */
 (() => {
-  if (matchMedia('(hover:hover)').matches) {
-    const map = $('#rippleMap'), noise = $('#rippleNoise');
-    const st = { s: 0, f: .01 };
-    let tw;
-    $$('.gcol img').forEach(img => img.addEventListener('mouseenter', () => {
-      if (tw) tw.kill();
-      tw = gsap.timeline({ onUpdate: () => { map.setAttribute('scale', st.s); noise.setAttribute('baseFrequency', `${st.f} ${st.f * 1.8}`); } })
-        .fromTo(st, { s: 0, f: .006 }, { s: 46, f: .014, duration: .45, ease: 'power2.out' })
-        .to(st, { s: 0, f: .02, duration: 1.4, ease: 'elastic.out(1,.4)' });
-    }));
-  }
-
   const orb = $('#bOrb'); if (!orb) return;
   const ring = $('.b-ring', orb), halo = $('.b-halo', orb), phase = $('#bPhase'), time = $('#bTime'), btn = $('#bStart'), snd = $('#bSound');
   let ctx, running = false, tl, tick, hb;
@@ -517,14 +505,19 @@ window.addEventListener('load', () => ScrollTrigger.refresh());
   const beat = () => {
     if (!snd.checked) return;
     ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
     const thump = (d, f, g) => {
-      const t = ctx.currentTime + d, o = ctx.createOscillator(), a = ctx.createGain();
-      o.type = 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(40, t + .18);
-      a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(g, t + .02); a.gain.exponentialRampToValueAtTime(.001, t + .22);
-      o.connect(a).connect(ctx.destination); o.start(t); o.stop(t + .25);
+      const t = ctx.currentTime + d;
+      [[f, g], [f * 2, g * .5]].forEach(([fr, gn]) => {
+        const o = ctx.createOscillator(), a = ctx.createGain();
+        o.type = 'triangle'; o.frequency.setValueAtTime(fr, t); o.frequency.exponentialRampToValueAtTime(fr * .4, t + .2);
+        a.gain.setValueAtTime(0.0001, t); a.gain.exponentialRampToValueAtTime(gn, t + .02); a.gain.exponentialRampToValueAtTime(.0001, t + .28);
+        o.connect(a).connect(ctx.destination); o.start(t); o.stop(t + .3);
+      });
     };
-    thump(0, 70, .35); thump(.28, 58, .22);
+    thump(0, 120, .9); thump(.3, 100, .6);
   };
+  snd.addEventListener('change', () => { if (snd.checked) beat(); });
   const stop = done => {
     running = false; clearInterval(tick); clearInterval(hb); if (tl) tl.kill();
     gsap.to([ring, halo], { scale: .62, duration: .8, ease: 'power2.out' });
@@ -543,4 +536,12 @@ window.addEventListener('load', () => ScrollTrigger.refresh());
       .add(() => { phase.textContent = 'Breathe out'; })
       .to([ring, halo], { scale: .62, duration: 6, ease: 'sine.inOut' });
   });
+})();
+
+/* ---------- patient crowd ---------- */
+(() => {
+  const g = $('#crowd'); if (!g) return;
+  const n = innerWidth < 860 ? 100 : 120;
+  g.innerHTML = '<i></i>'.repeat(n);
+  gsap.to($$('i', g), { opacity: 1, duration: .5, stagger: { each: .02, from: 'random' }, ease: 'power1.out', scrollTrigger: { trigger: g, start: 'top 88%', once: true } });
 })();
